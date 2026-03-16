@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bakery Stock Control</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Bakery Stock Control</h1>
+      <p>Offline production-based inventory system</p>
+    </div>
+    <div class="header-actions">
+      <button id="seedBtn" class="secondary">Load Sample Data</button>
+      <button id="resetBtn" class="danger">Reset All Data</button>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="dashboard">Dashboard</button>
+    <button class="tab" data-tab="materials">Raw Materials</button>
+    <button class="tab" data-tab="products">Products</button>
+    <button class="tab" data-tab="recipes">Recipes</button>
+    <button class="tab" data-tab="production">Daily Production</button>
+  </nav>
+
+  <main>
+    <section id="dashboard" class="tab-panel active">
+      <div class="card-grid stats-grid">
+        <article class="card stat-card">
+          <span>Total Materials</span>
+          <strong id="statMaterials">0</strong>
+        </article>
+        <article class="card stat-card warning">
+          <span>Low Stock Items</span>
+          <strong id="statLow">0</strong>
+        </article>
+        <article class="card stat-card">
+          <span>Products</span>
+          <strong id="statProducts">0</strong>
+        </article>
+        <article class="card stat-card danger">
+          <span>Need Refill</span>
+          <strong id="statRefill">0</strong>
+        </article>
+      </div>
+
+      <div class="card-grid two-col">
+        <article class="card">
+          <h2>Current Stock Summary</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Material</th>
+                  <th>Balance</th>
+                  <th>Min Limit</th>
+                  <th>Refill Target</th>
+                  <th>Need to Fill</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="dashboardStockBody"></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>Today Production Log</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Product</th>
+                  <th>Qty</th>
+                </tr>
+              </thead>
+              <tbody id="productionLogBody"></tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="materials" class="tab-panel">
+      <article class="card form-card">
+        <h2>Add / Update Raw Material</h2>
+        <form id="materialForm" class="grid-form">
+          <input type="hidden" id="materialId" />
+          <label>
+            Material Name
+            <input id="materialName" required placeholder="Flour" />
+          </label>
+          <label>
+            Unit
+            <input id="materialUnit" required placeholder="kg / g / l / pcs" />
+          </label>
+          <label>
+            Current Stock
+            <input id="materialStock" type="number" min="0" step="0.01" required />
+          </label>
+          <label>
+            Min Limit
+            <input id="materialMin" type="number" min="0" step="0.01" required />
+          </label>
+          <label>
+            Refill Target
+            <input id="materialTarget" type="number" min="0" step="0.01" required />
+          </label>
+          <div class="form-actions">
+            <button type="submit">Save Material</button>
+            <button type="button" id="clearMaterialBtn" class="secondary">Clear</button>
+          </div>
+        </form>
+      </article>
+
+      <article class="card">
+        <h2>Raw Materials</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Stock</th>
+                <th>Min</th>
+                <th>Target</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="materialsBody"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <section id="products" class="tab-panel">
+      <article class="card form-card">
+        <h2>Add Product</h2>
+        <form id="productForm" class="grid-form compact-form">
+          <input type="hidden" id="productId" />
+          <label>
+            Product Name
+            <input id="productName" required placeholder="Cake" />
+          </label>
+          <div class="form-actions">
+            <button type="submit">Save Product</button>
+            <button type="button" id="clearProductBtn" class="secondary">Clear</button>
+          </div>
+        </form>
+      </article>
+
+      <article class="card">
+        <h2>Products</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Recipe Items</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="productsBody"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <section id="recipes" class="tab-panel">
+      <article class="card form-card">
+        <h2>Set Recipe Per 1 Product</h2>
+        <form id="recipeForm" class="grid-form compact-form">
+          <label>
+            Product
+            <select id="recipeProduct" required></select>
+          </label>
+          <label>
+            Material
+            <select id="recipeMaterial" required></select>
+          </label>
+          <label>
+            Qty Needed for 1 Product
+            <input id="recipeQty" type="number" min="0.001" step="0.001" required />
+          </label>
+          <div class="form-actions">
+            <button type="submit">Add Recipe Item</button>
+          </div>
+        </form>
+      </article>
+
+      <article class="card">
+        <h2>Recipe List</h2>
+        <div id="recipeCards" class="recipe-cards"></div>
+      </article>
+    </section>
+
+    <section id="production" class="tab-panel">
+      <article class="card form-card">
+        <h2>Daily Production Entry</h2>
+        <form id="productionForm" class="grid-form compact-form">
+          <label>
+            Product
+            <select id="productionProduct" required></select>
+          </label>
+          <label>
+            Quantity Produced Today
+            <input id="productionQty" type="number" min="1" step="1" required />
+          </label>
+          <div class="form-actions">
+            <button type="submit">Process Production</button>
+          </div>
+        </form>
+        <p class="muted">When you submit, raw material stock will be automatically deducted based on the recipe.</p>
+      </article>
+
+      <article class="card">
+        <h2>Material Usage Preview</h2>
+        <div id="usagePreview" class="empty-state">Select a product and quantity to see required materials.</div>
+      </article>
+    </section>
+  </main>
+
+  <template id="statusTemplate">
+    <span class="badge"></span>
+  </template>
+
+  <script src="script.js"></script>
+</body>
+</html>
